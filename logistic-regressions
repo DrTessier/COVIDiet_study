@@ -1,0 +1,69 @@
+
+### Identify best fit logistic regression model ###
+
+data2$CLASS2 <- factor(data2$CLASS2)
+data2$PROV <- factor(data2$PROV)
+data2$GNDR <- factor(data2$GNDR)
+data2$EDU <- factor(data2$EDU)
+data2$ETH_GR_MLTP <- factor(data2$ETH_GR_MLTP)
+data2$STRESS <- factor(data2$STRESS)
+data2$ROUTINE_CHANGE <- factor(data2$ROUTINE_CHANGE)
+data2$SLEEP_QUAL_CHANGE <- factor(data2$SLEEP_QUAL_CHANGE)
+data2$Body_IMG <- factor(data2$Body_IMG)
+data2$CHRONIC_DISEASE <- factor(data2$CHRONIC_DISEASE)
+data2$INCM <- factor(data2$INCM)
+data2$INCM_CHNG <- factor(data2$INCM_CHNG)
+data2$LIV_SIT_CHANGE <- factor(data2$LIV_SIT_CHANGE)
+data2$EXChrs <- factor(data2$EXChrs)
+data2$SMOKE_CHANGE <- factor(data2$SMOKE_CHANGE)
+data2$DIET_PRIOR_FOODBANK <- factor(data2$DIET_PRIOR_FOODBANK)
+data2$DIET_COVID_BAL <- factor(data2$DIET_COVID_BAL)
+data2$DIET_COVID_FOODBANK <- factor(data2$DIET_COVID_FOODBANK)
+data2$DIET_COVID_TAKEOUT <- factor(data2$DIET_COVID_TAKEOUT)
+data2$RESTRICTION <- factor(data2$RESTRICTION)
+data2$GADscore <- factor(data2$GADscore)
+data2$CESDscore <- factor(data2$CESDscore)
+
+summary(data2)
+
+xtabs(~CLASS2 + ROUTINE_CHANGE, data = data2)
+
+xtabs(~CLASS2 + STRESS, data = data2)
+
+xtabs(~CLASS2 + Agecat, data = data2)
+
+xtabs(~CLASS2 + GNDR, data = data2)
+
+xtabs(~CLASS2 + PROV, data = data2)
+
+xtabs(~CLASS2 + Body_IMG, data = data2)
+
+xtabs(~CLASS2 + SLEEP_QUAL_CHANGE, data = data2)
+
+xtabs(~CLASS2 + SMOKE_CHANGE, data = data2)
+
+logistic1 <- glm(CLASS2 ~ AGE + GNDR + EDU + ETH_GR_MLTP + RESTRICTION + PROV, data=data2, family="binomial")
+summary(logistic1)
+
+logisticFinal <- glm(CLASS2 ~ AGE + GNDR + INCM_CHNG + ETH_GR_MLTP + STRESS + ROUTINE_CHANGE + Body_IMG + CHRONIC_DISEASE + LIV_SIT_CHANGE + PROV,  data=data2, family="binomial")
+summary(logisticFinal)
+
+logisticFinal2 <- glm(CLASS2 ~ AGE + GNDR + INCM_CHNG + ETH_GR_MLTP + RESTRICTION + STRESS + ROUTINE_CHANGE + Body_IMG + CHRONIC_DISEASE + LIV_SIT_CHANGE + PROV,  data=data2, family="binomial")
+summary(logisticFinal2)
+
+logisticFinal3 <- glm(CLASS2 ~ AGE + GNDR + INCM_CHNG + GADscore + CESDscore + ETH_GR_MLTP + RESTRICTION + STRESS + ROUTINE_CHANGE + Body_IMG + CHRONIC_DISEASE + LIV_SIT_CHANGE + PROV,  data=data2, family="binomial")
+summary(logisticFinal3)
+
+logisticFinal4 <- glm(CLASS2 ~ AGE + GNDR + INCM_CHNG + GAD7 + CESD10 + ETH_GR_MLTP + RESTRICTION + STRESS + ROUTINE_CHANGE + Body_IMG + CHRONIC_DISEASE + LIV_SIT_CHANGE + PROV,  data=data2, family="binomial")
+summary(logisticFinal4)
+
+logNoProv <- glm(CLASS ~ AGE + GNDR + INCM_CHNG + ETH_GR_MLTP + STRESS + ROUTINE_CHANGE + Body_IMG + CHRONIC_DISEASE + LIV_SIT_CHANGE,  data=data2, family="binomial")
+summary(logNoProv)
+
+#Get odds ratios
+oddsratios <- exp(coef(logisticFinal3)) 
+oddsratios
+
+
+
+
