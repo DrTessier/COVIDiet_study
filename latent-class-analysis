@@ -1,0 +1,47 @@
+
+### Identify best fit LCA model to determine lifestyle change pattern classes ###
+
+#Download library
+install.packages("poLCA")
+library(poLCA)
+
+#Load data
+data <- read.delim(file.choose(), header=TRUE)
+View(data)
+
+#Identify missing data
+data[data == 98] <- NA
+data[data == 99] <- NA
+
+data2 <- data[complete.cases(data[ , c('WT_CHANGE_CAT', 'ALC_CHANGE', 'EXCI_CHANGE', 'PERCEIVE', 'SLEEP_QUAL_CHANGE', 'SMOKE_CHANGE')]), ]
+View(data2)
+
+data2 <- data[complete.cases(data[ ,c('WT_CHANGE_CAT','WT_CHANGE_3CAT','ALC_CHANGE','EXCI_CHANGE','EXCI_CHANGE_3CAT','PERCEIVE','SLEEP_QUAL_CHANGE',"SMOKE_CHANGE","SMOKE_CHANGE_3CAT")]), ]
+View(data2)
+
+f <- cbind(WT_CHANGE_CAT, ALC_CHANGE, EXCI_CHANGE, PERCEIVE, SLEEP_QUAL_CHANGE, SMOKE_CHANGE) ~ 1
+M0 <- poLCA(f,data2,nclass=1)
+M1 <- poLCA(f,data2,nclass=2, graphs=TRUE, na.rm=TRUE)
+
+#Define LCA model with 3 categories of coding for weight, smoking and exercise
+
+f <- cbind(WT_CHANGE_3CAT, ALC_CHANGE, EXCI_CHANGE_3CAT, PERCEIVE, SLEEP_QUAL_CHANGE, SMOKE_CHANGE_3CAT) ~ 1
+M0 <- poLCA(f,data2,nclass=1)
+M1 <- poLCA(f,data2,nclass=2, graphs=TRUE, na.rm=TRUE)
+M2 <- poLCA(f,data2,nclass=3,maxiter=8000, graphs=TRUE, na.rm=TRUE)
+
+## Test statistics
+#Find maximum entropy
+log(prod(sapply(M1$probs,ncol)))
+p.hat <- M1$predcell$observed/M1$N
+
+#Find sample entropy
+H.hat <- -sum(p.hat * log(p.hat))
+H.hat
+
+poLCA.entropy(M1)
+
+## Create new variable of lifestyle membership obtained from LCA model 
+data2$CLASS2 <- NA
+data2$CLASS2 <- M1$predclass
+
