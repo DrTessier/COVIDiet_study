@@ -42,31 +42,31 @@ xtabs(~CLASS2 + SLEEP_QUAL_CHANGE, data = data2)
 
 xtabs(~CLASS2 + SMOKE_CHANGE, data = data2)
 
-logistic_model1 <- glm(as.factor(CLASS2) ~ AGE + as.factor(GNDR) + as.factor(ETH_GR_MLTP) + as.factor(RESTRICTION) + as.factor(PROV), data=data2, family="binomial")
+logistic_model1 <- glm(as.factor(CLASS) ~ AGE + as.factor(GNDR) + as.factor(ETH_GR_MLTP) + as.factor(RESTRICTION) + as.factor(PROV), data=data2, family="binomial")
 summary(logistic_model1)
 
-### GAD7 and CESD10 as categorical variables
+### GAD7 and CESD10 as categorical variables - selected model for manuscript
 
-logistic_model2 <- glm(as.factor(CLASS2) ~ AGE + as.factor(GNDR) + as.factor(ETH_GR_MLTP) + as.factor(INCM_CHNG) + as.factor(GADscore) + as.factor(CESDscore) + as.factor(RESTRICTION) + as.factor(STRESS) + as.factor(ROUTINE_CHANGE) + 
+logistic_model2 <- glm(as.factor(CLASS) ~ AGE + as.factor(GNDR) + as.factor(ETH_GR_MLTP) + as.factor(INCM_CHNG) + as.factor(GADscore) + as.factor(CESDscore) + as.factor(RESTRICTION) + as.factor(STRESS) + as.factor(ROUTINE_CHANGE) + 
 as.factor(Body_IMG) + as.factor(CHRONIC_DISEASE) + as.factor(LIV_SIT_CHANGE) + as.factor(PROV),  data=data2, family="binomial")
 summary(logistic_model2)
 
 ### GAD7 and CESD10 as continuous variables
 
-logistic_model3 <- glm(as.factor(CLASS2) ~ AGE + as.factor(GNDR) + as.factor(ETH_GR_MLTP) + as.factor(INCM_CHNG) + GAD7 + CESD10 + as.factor(RESTRICTION) + as.factor(STRESS) + as.factor(ROUTINE_CHANGE) + 
+logistic_model3 <- glm(as.factor(CLASS) ~ AGE + as.factor(GNDR) + as.factor(ETH_GR_MLTP) + as.factor(INCM_CHNG) + GAD7 + CESD10 + as.factor(RESTRICTION) + as.factor(STRESS) + as.factor(ROUTINE_CHANGE) + 
 as.factor(Body_IMG) + as.factor(CHRONIC_DISEASE) + as.factor(LIV_SIT_CHANGE) + as.factor(PROV),  data=data2, family="binomial")
 summary(logistic_model3)
 
 
 ### stratified analyses
 
-logistic_regression_age <- dlply(data2, "Agecat_two", function(x) glm(as.factor(CLASS2) ~ as.factor(GNDR) + as.factor(INCM_CHNG) + as.factor(GADscore) + as.factor(CESDscore) + as.factor(ETH_GR_MLTP) + as.factor(STRESS) 
+logistic_regression_age <- dlply(data2, "Agecat_two", function(x) glm(as.factor(CLASS) ~ as.factor(GNDR) + as.factor(INCM_CHNG) + as.factor(GADscore) + as.factor(CESDscore) + as.factor(ETH_GR_MLTP) + as.factor(STRESS) 
   + as.factor(ROUTINE_CHANGE) + as.factor(Body_IMG) + as.factor(CHRONIC_DISEASE) + as.factor(LIV_SIT_CHANGE) + as.factor(PROV), data=data2, family="binomial"))
 
-logistic_regression_bmi <- dlply(data2, "BMI_twocat", function(x) glm(as.factor(CLASS2) ~ AGE + as.factor(GNDR) + as.factor(INCM_CHNG) + as.factor(GADscore) + as.factor(CESDscore) + as.factor(ETH_GR_MLTP) + as.factor(RESTRICTION) + 
+logistic_regression_bmi <- dlply(data2, "BMI_twocat", function(x) glm(as.factor(CLASS) ~ AGE + as.factor(GNDR) + as.factor(INCM_CHNG) + as.factor(GADscore) + as.factor(CESDscore) + as.factor(ETH_GR_MLTP) + as.factor(RESTRICTION) + 
   as.factor(STRESS) + as.factor(ROUTINE_CHANGE) + as.factor(Body_IMG) + as.factor(CHRONIC_DISEASE) + as.factor(LIV_SIT_CHANGE) + as.factor(PROV), data=x, family="binomial"))
 
-logistic_regression_wave <- dlply(data2, "RESTRICTION", function(x) glm(as.factor(CLASS2) ~ AGE + as.factor(GNDR) + as.factor(INCM_CHNG) + as.factor(GADscore) + as.factor(CESDscore) + as.factor(ETH_GR_MLTP) + as.factor(STRESS) + 
+logistic_regression_wave <- dlply(data2, "RESTRICTION", function(x) glm(as.factor(CLASS) ~ AGE + as.factor(GNDR) + as.factor(INCM_CHNG) + as.factor(GADscore) + as.factor(CESDscore) + as.factor(ETH_GR_MLTP) + as.factor(STRESS) + 
   as.factor(ROUTINE_CHANGE) + as.factor(Body_IMG) + as.factor(CHRONIC_DISEASE) + as.factor(LIV_SIT_CHANGE) + as.factor(PROV), data=x, family="binomial"))
 
 
@@ -77,7 +77,30 @@ oddsratios1
 oddsratios2 <- exp(coef(logistic_model2)) 
 oddsratios2
 
-oddsratios3 <- exp(coef(logistic_model23)) 
+oddsratios3 <- exp(coef(logistic_model3)) 
 oddsratios3
+
+### Get 95% confidence intervals
+conf_interv1 <- exp(confint.default((logistic_model1)))
+conf_interv2 <- exp(confint.default((logistic_model2)))
+conf_interv3 <- exp(confint.default((logistic_model3)))
+
+
+#### gender-weighted analysis ###
+## define weights based on Census gender proportions
+
+data2$wt <- 99
+data2$wt[data2$GNDR==1] <- 7.13 #men - adjust to make it 49.29%
+data2$wt[data2$GNDR==2] <- 0.54 #women - adjust to make it 50.64%
+data2$wt[data2$GNDR==3] <- 0.05 #gender minority from 2019 census (non-binary) - adjust to make it 0.07%
+
+### logistic regressions with weights
+
+logistic_model_weight <- glm(as.factor(CLASS) ~ AGE + as.factor(GNDR) + as.factor(ETH_GR_MLTP) + as.factor(INCM_CHNG) + as.factor(GADscore) + as.factor(CESDscore) + as.factor(RESTRICTION) + as.factor(STRESS) + as.factor(ROUTINE_CHANGE) + 
+  as.factor(Body_IMG) + as.factor(CHRONIC_DISEASE) + as.factor(LIV_SIT_CHANGE) + as.factor(PROV),  weights=wt, data=data2, family="binomial")
+
+summary(logistic_model_weight)
+
+
 
 
