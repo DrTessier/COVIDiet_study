@@ -104,9 +104,14 @@ summary(logistic_model_weight)
 
 ### Stratified analysis by age 
 
+library(plyr)
+
 data2 <- data2[complete.cases(data2[ ,c("Agecat_two")]), ]
-logistic_regression_age <- dlply(data2, "Agecat_two", function(x) glm(as.factor(CLASS2) ~ as.factor(GNDR) + as.factor(INCM_CHNG) + as.factor(GADscore) + as.factor(CESDscore) + as.factor(ETH_GR_MLTP) + as.factor(RESTRICTION) + as.factor(STRESS) + as.factor(ROUTINE_CHANGE) + 
+
+logistic_regression_age <- dlply(data2, "Agecat_two", function(x) glm(as.factor(CLASS) ~ as.factor(GNDR) + as.factor(INCM_CHNG) + as.factor(GADscore) + as.factor(CESDscore) + as.factor(ETH_GR_MLTP) + as.factor(RESTRICTION) + as.factor(STRESS) + as.factor(ROUTINE_CHANGE) + 
   as.factor(Body_IMG) + as.factor(CHRONIC_DISEASE) + as.factor(LIV_SIT_CHANGE) + as.factor(PROV), data=x, family="binomial"))
+
+l_ply(logistic_regression_age, summary, .print = TRUE)
 
 ### Get odds ratios
 oddsratios_age0 <- exp(coef(logistic_regression_age$`0`))
@@ -126,21 +131,23 @@ conf_interv_age1
 
 data2 <- data2[complete.cases(data2[ ,c("BMI_twocat")]), ]
 
-logistic_regression_bmi <- dlply(data2, "BMI_twocat", function(x) glm(as.factor(CLASS2) ~ AGE + as.factor(GNDR) + as.factor(INCM_CHNG) + as.factor(GADscore) + as.factor(CESDscore) + as.factor(ETH_GR_MLTP) + as.factor(RESTRICTION) + as.factor(STRESS) + 
+logistic_regression_bmi <- dlply(data2, "BMI_twocat", function(x) glm(as.factor(CLASS) ~ AGE + as.factor(GNDR) + as.factor(INCM_CHNG) + as.factor(GADscore) + as.factor(CESDscore) + as.factor(ETH_GR_MLTP) + as.factor(RESTRICTION) + as.factor(STRESS) + 
   as.factor(ROUTINE_CHANGE) + as.factor(Body_IMG) + as.factor(CHRONIC_DISEASE) + as.factor(LIV_SIT_CHANGE) + as.factor(PROV), data=x, family="binomial"))
 
+l_ply(logistic_regression_bmi, summary, .print = TRUE)
+
 ### Get odds ratios
-oddsratios_BMI0 <- exp(coef(logistic_regression_BMI$`0`))
+oddsratios_BMI0 <- exp(coef(logistic_regression_bmi$`0`))
 oddsratios_BMI0
 
-oddsratios_BMI1 <- exp(coef(logistic_regression_BMI$`1`))
+oddsratios_BMI1 <- exp(coef(logistic_regression_bmi$`1`))
 oddsratios_BMI1
 
 ### Get 95% confidence intervals
-conf_interv_BMI0 <- exp(confint.default((logistic_regression_BMI$`0`)))
+conf_interv_BMI0 <- exp(confint.default((logistic_regression_bmi$`0`)))
 conf_interv_BMI0
 
-conf_interv_BMI1 <- exp(confint.default((logistic_regression_BMI$`1`)))
+conf_interv_BMI1 <- exp(confint.default((logistic_regression_bmi$`1`)))
 conf_interv_BMI1
 
 
@@ -150,6 +157,8 @@ data2 <- data2[complete.cases(data2[ ,c("RESTRICTION")]), ]
 
 logistic_regression_wave <- dlply(data2, "RESTRICTION", function(x) glm(as.factor(CLASS2) ~ AGE + as.factor(GNDR) + as.factor(INCM_CHNG) + as.factor(GADscore) + as.factor(CESDscore) + as.factor(ETH_GR_MLTP) + as.factor(STRESS) + as.factor(ROUTINE_CHANGE) + 
   as.factor(Body_IMG) + as.factor(CHRONIC_DISEASE) + as.factor(LIV_SIT_CHANGE) + as.factor(PROV), data=x, family="binomial"))
+
+l_ply(logistic_regression_wave, summary, .print = TRUE)
 
 ### Get odds ratios
 oddsratios_wave0 <- exp(coef(logistic_regression_wave$`0`))
